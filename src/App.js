@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Home from './Pages/Home';
+import UserLogin from './Components/UserLogin';
+import UserSignup from './Components/UserSignup';
+import Dashboard from './Pages/Dashboard';
+import './index.css';
 
-function App() {
+const App = () => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem('user');
+    if (loggedInUser) {
+      setUser(JSON.parse(loggedInUser));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<UserLogin setUser={setUser} />} />
+        <Route path="/signup" element={<UserSignup setUser={setUser} />} />
+        <Route 
+          path="/dashboard" 
+          element={user ? <Dashboard user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}
+        />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
